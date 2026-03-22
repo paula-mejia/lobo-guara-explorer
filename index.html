@@ -3913,28 +3913,13 @@ let DATA = RAW.map(computeEntry);
 
 function recomputeData() {
   DATA = RAW.map(computeEntry);
-  filtered = applyFilters();
   if (selected) { selected = DATA.find(d => d.name === selected.name) || null; }
-  renderChart();
-  renderRanking();
   if (selected) renderDetail(selected);
-  updateStats();
+  // applyFilters handles filtered, renderChart, resetRanking, and stats
+  if (typeof applyFilters === 'function') applyFilters();
 }
 
 // === STATE ===
-function applyFilters() {
-  let f = [...DATA];
-  const type = filterType ? filterType.value : 'all';
-  const fund = filterFund ? filterFund.value : 'all';
-  const search = searchInput ? searchInput.value.toLowerCase() : '';
-  const minScore = filterScore ? parseFloat(filterScore.value) : 0;
-  if (type === 'portfolio') f = f.filter(d => d.isPortfolio);
-  else if (type === 'non-portfolio') f = f.filter(d => !d.isPortfolio);
-  if (fund !== 'all') f = f.filter(d => d.fund === parseInt(fund));
-  if (search) f = f.filter(d => d.name.toLowerCase().includes(search));
-  if (minScore > 0) f = f.filter(d => d.overall >= minScore);
-  return f;
-}
 let filtered = [...DATA];
 let selected = null;
 let compareMode = false;
