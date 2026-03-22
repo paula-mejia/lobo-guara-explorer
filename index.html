@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Lobo-Guara Explorer | Canary VC</title>
+<title>Lobo-Guarã Explorer | Canary VC</title>
 <style>
 * { margin:0; padding:0; box-sizing:border-box; }
 body { background:#f8f9fb; color:#001B4C; font-family:'Objektiv',-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif; overflow-x:hidden; }
@@ -150,8 +150,8 @@ body { background:#f8f9fb; color:#001B4C; font-family:'Objektiv',-apple-system,B
       <polygon fill="#FFFFFF" points="1641.29,228.25 1582.32,307.04 1523.48,228.25 1458.83,220.58 1552.93,346.31 1482.98,439.77 1538.24,439.77 1702.29,220.58"/>
     </svg>
   </div>
-  <h1><span>Lobo-Guara</span> Explorer</h1>
-  <p class="subtitle">Mapping 3,611 founders on Canary's "hedgehog vs fox" spectrum. The Lobo-Guara (maned wolf) is the hybrid archetype from Canary's Q4 2025 investor letter -- founders who combine deep conviction with broad ambition.</p>
+  <h1><span>Lobo-Guarã</span> Explorer</h1>
+  <p class="subtitle">Mapping 3,611 founders on Canary's "hedgehog vs fox" spectrum. The Lobo-Guarã (maned wolf) is the hybrid archetype from Canary's Q4 2025 investor letter -- founders who combine deep conviction with broad ambition.</p>
   <p class="stats">3,611 scored founders | 193 portfolio companies | Canary Intelligence Layer | March 22, 2026</p>
 </div>
 
@@ -165,7 +165,7 @@ body { background:#f8f9fb; color:#001B4C; font-family:'Objektiv',-apple-system,B
     <p>Narrative and ambition. Recruit talent, sell the vision, raise global capital. Measured by: Ambition + Sales Ability + Reputation</p>
   </div>
   <div class="legend-card lobo">
-    <h3>Lobo-Guara Zone</h3>
+    <h3>Lobo-Guarã Zone</h3>
     <p>The hybrid archetype. Hedgehog on the inside, fox on the outside. Enduring enough to grind through the Cerrado, ambitious enough to build something the world cannot ignore.</p>
   </div>
   <div class="legend-card" style="border-color:#008CFF;">
@@ -226,7 +226,7 @@ body { background:#f8f9fb; color:#001B4C; font-family:'Objektiv',-apple-system,B
     <button class="compare-btn active" id="scoreToggle" style="background:#008CFF;color:#fff;" title="Click to see original team scores">AI-Adjusted</button>
   </div>
   <button class="compare-btn" id="compareToggle">Compare Mode</button>
-  <div class="stats-text" id="statsText">Showing 3,611 | Portfolio 193 | Lobo-Guara 0</div>
+  <div class="stats-text" id="statsText">Showing 3,611 | Portfolio 193 | Lobo-Guarã 0</div>
 </div>
 
 <div class="main">
@@ -3955,7 +3955,7 @@ function recomputeData() {
   return; // applyFilters handles everything below
   const pCount = filtered.filter(d => d.isPortfolio).length;
   const lCount = filtered.filter(d => d.archetype === 'lobo').length;
-  statsText.textContent = 'Showing ' + filtered.length + ' | Portfolio ' + pCount + ' | Lobo-Guara ' + lCount;
+  statsText.textContent = 'Showing ' + filtered.length + ' | Portfolio ' + pCount + ' | Lobo-Guarã ' + lCount;
   renderChart();
   resetRanking();
 }
@@ -4040,7 +4040,7 @@ function applyFilters() {
 
   const pCount = filtered.filter(d => d.isPortfolio).length;
   const lCount = filtered.filter(d => d.archetype === 'lobo').length;
-  statsText.textContent = `Showing ${filtered.length} | Portfolio ${pCount} | Lobo-Guara ${lCount}`;
+  statsText.textContent = `Showing ${filtered.length} | Portfolio ${pCount} | Lobo-Guarã ${lCount}`;
 
   renderChart();
   resetRanking();
@@ -4096,7 +4096,7 @@ function renderChart() {
   ctx.fillText('HEDGEHOG SCORE  (FMF + Skin in the Game)', 0, 0);
   ctx.restore();
 
-  // Lobo-Guara zone
+  // Lobo-Guarã zone
   const lx = toCanvasX(0.7);
   const ly = toCanvasY(1);
   const lw = toCanvasX(1) - lx;
@@ -4283,7 +4283,7 @@ function selectCompany(d) {
 
 // === RENDER DETAIL ===
 function renderDetail(d) {
-  const arcLabel = {lobo:'Lobo-Guara',hedgehog:'Hedgehog',fox:'Fox',developing:'Developing'}[d.archetype];
+  const arcLabel = {lobo:'Lobo-Guarã',hedgehog:'Hedgehog',fox:'Fox',developing:'Developing'}[d.archetype];
   const arcClass = {lobo:'badge-lobo',hedgehog:'badge-hedgehog',fox:'badge-fox',developing:'badge-developing'}[d.archetype];
 
   let badges = d.isPortfolio
@@ -4442,7 +4442,7 @@ function renderMoreRanking() {
     const d = filtered[i];
     const row = document.createElement('div');
     row.className = 'ranking-item';
-    const arcLabel = {lobo:'Lobo-Guara',hedgehog:'Hedgehog',fox:'Fox',developing:'Developing'}[d.archetype];
+    const arcLabel = {lobo:'Lobo-Guarã',hedgehog:'Hedgehog',fox:'Fox',developing:'Developing'}[d.archetype];
     const arcColor = {lobo:'rgba(182,226,21,.15)',hedgehog:'rgba(45,106,79,.15)',fox:'rgba(231,111,81,.15)',developing:'rgba(149,165,166,.1)'}[d.archetype];
     const arcTextColor = {lobo:'#7BA30F',hedgehog:'#2d6a4f',fox:'#e76f51',developing:'#95a5a6'}[d.archetype];
     const dotColor = d.isPortfolio ? '#084893' : '#95a5a6';
@@ -4542,7 +4542,7 @@ function renderCompare() {
   const colors = ['#008CFF','#084893','#2d6a4f','#e76f51'];
 
   compareGrid.innerHTML = compareList.map((d, ci) => {
-    const arcLabel = {lobo:'Lobo-Guara',hedgehog:'Hedgehog',fox:'Fox',developing:'Developing'}[d.archetype];
+    const arcLabel = {lobo:'Lobo-Guarã',hedgehog:'Hedgehog',fox:'Fox',developing:'Developing'}[d.archetype];
     const dims = [
       { label:'FMF', val:d.fmf, color:'#2d6a4f' },
       { label:'Skin', val:d.skin, color:'#40916c' },
