@@ -3913,10 +3913,28 @@ let DATA = RAW.map(computeEntry);
 
 function recomputeData() {
   DATA = RAW.map(computeEntry);
-  if (selected) { selected = DATA.find(d => d.name === selected.name) || null; }
-  if (selected) renderDetail(selected);
-  // applyFilters handles filtered, renderChart, resetRanking, and stats
-  if (typeof applyFilters === 'function') applyFilters();
+  if (selected) {
+    const found = DATA.find(d => d.name === selected.name);
+    if (found) { selected = found; renderDetail(found); }
+  }
+  // Re-run filter + render pipeline
+  const type = filterType.value;
+  const fund = filterFund.value;
+  const search = searchInput.value.toLowerCase().trim();
+  const minScore = parseFloat(filterScore.value);
+  filtered = DATA.filter(d => {
+    if (type === 'portfolio' && !d.isPortfolio) return false;
+    if (type === 'non-portfolio' && d.isPortfolio) return false;
+    if (fund !== 'all' && d.fund !== parseInt(fund)) return false;
+    if (search && !d.name.toLowerCase().includes(search)) return false;
+    if (d.overall < minScore) return false;
+    return true;
+  });
+  const pCount = filtered.filter(d => d.isPortfolio).length;
+  const lCount = filtered.filter(d => d.archetype === 'lobo').length;
+  statsText.textContent = 'Showing ' + filtered.length + ' | Portfolio ' + pCount + ' | Lobo-Guara ' + lCount;
+  renderChart();
+  resetRanking();
 }
 
 // === STATE ===
