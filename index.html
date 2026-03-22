@@ -37,6 +37,10 @@ body { background:#f8f9fb; color:#001B4C; font-family:'Objektiv',-apple-system,B
 .controls .compare-btn { background:#fff; border:1px solid #008CFF; color:#008CFF; padding:6px 14px; border-radius:4px; font-size:13px; cursor:pointer; transition:all .2s; }
 .controls .compare-btn:hover, .controls .compare-btn.active { background:#008CFF; color:#fff; }
 .controls .stats-text { margin-left:auto; font-size:12px; color:#4A6178; }
+.pill-group { display:flex; gap:3px; flex-wrap:wrap; }
+.pill { background:#f8f9fb; border:1px solid #d0d4db; color:#4A6178; padding:3px 8px; border-radius:12px; font-size:11px; cursor:pointer; transition:all .15s; }
+.pill:hover { border-color:#008CFF; color:#008CFF; }
+.pill.active { background:#008CFF; border-color:#008CFF; color:#fff; }
 
 .main { display:flex; height:calc(100vh - 260px); min-height:500px; }
 .chart-area { flex:0 0 70%; position:relative; border-right:1px solid #e0e3e8; background:#fff; }
@@ -172,25 +176,25 @@ body { background:#f8f9fb; color:#001B4C; font-family:'Objektiv',-apple-system,B
   </div>
   <div class="ctrl-group">
     <label>Fund</label>
-    <select id="filterFund">
-      <option value="all">All</option>
-      <option value="1">Fund 1</option>
-      <option value="2">Fund 2</option>
-      <option value="3">Fund 3</option>
-      <option value="4">Fund 4</option>
-    </select>
+    <div class="pill-group" id="fundPills">
+      <button class="pill active" data-val="all">All</button>
+      <button class="pill" data-val="1">1</button>
+      <button class="pill" data-val="2">2</button>
+      <button class="pill" data-val="3">3</button>
+      <button class="pill" data-val="4">4</button>
+    </div>
   </div>
   <div class="ctrl-group">
     <label>Relationship</label>
-    <select id="filterRel">
-      <option value="all">All</option>
-      <option value="Active Support">Active Support</option>
-      <option value="Monitoring">Monitoring</option>
-      <option value="Non Operating Company">Non Operating</option>
-      <option value="Exit">Exit</option>
-      <option value="Crypto">Crypto</option>
-      <option value="SwapShares">SwapShares</option>
-    </select>
+    <div class="pill-group" id="relPills">
+      <button class="pill active" data-val="all">All</button>
+      <button class="pill" data-val="Active Support">Active</button>
+      <button class="pill" data-val="Monitoring">Monitor</button>
+      <button class="pill" data-val="Non Operating Company">Non-Op</button>
+      <button class="pill" data-val="Exit">Exit</button>
+      <button class="pill" data-val="Crypto">Crypto</button>
+      <button class="pill" data-val="SwapShares">Swap</button>
+    </div>
   </div>
   <div class="ctrl-group">
     <label>Search</label>
@@ -3933,20 +3937,8 @@ function recomputeData() {
     if (found) { selected = found; renderDetail(found); }
   }
   // Re-run filter + render pipeline
-  const type = filterType.value;
-  const fund = filterFund.value;
-  const rel = document.getElementById('filterRel').value;
-  const search = searchInput.value.toLowerCase().trim();
-  const minScore = parseFloat(filterScore.value);
-  filtered = DATA.filter(d => {
-    if (type === 'portfolio' && !d.isPortfolio) return false;
-    if (type === 'non-portfolio' && d.isPortfolio) return false;
-    if (fund !== 'all' && d.fund !== parseInt(fund)) return false;
-    if (rel !== 'all' && d.relType !== rel) return false;
-    if (search && !d.name.toLowerCase().includes(search)) return false;
-    if (d.overall < minScore) return false;
-    return true;
-  });
+  applyFilters();
+  return; // applyFilters handles everything below
   const pCount = filtered.filter(d => d.isPortfolio).length;
   const lCount = filtered.filter(d => d.archetype === 'lobo').length;
   statsText.textContent = 'Showing ' + filtered.length + ' | Portfolio ' + pCount + ' | Lobo-Guara ' + lCount;
@@ -3967,7 +3959,7 @@ const canvas = document.getElementById('scatterCanvas');
 const ctx = canvas.getContext('2d');
 const tooltip = document.getElementById('tooltip');
 const filterType = document.getElementById('filterType');
-const filterFund = document.getElementById('filterFund');
+const filterFund = document.getElementById('filterFund'); // legacy ref, unused
 const searchInput = document.getElementById('searchInput');
 const filterScore = document.getElementById('filterScore');
 const statsText = document.getElementById('statsText');
@@ -4001,18 +3993,25 @@ function resize() {
 }
 
 // === FILTERING ===
+function getActivePills(groupId) {
+  const pills = document.querySelectorAll('#' + groupId + ' .pill.active');
+  const vals = Array.from(pills).map(p => p.dataset.val);
+  if (vals.includes('all')) return null; // no filter
+  return vals;
+}
+
 function applyFilters() {
   const type = filterType.value;
-  const fund = filterFund.value;
-  const rel = document.getElementById('filterRel').value;
+  const funds = getActivePills('fundPills');
+  const rels = getActivePills('relPills');
   const search = searchInput.value.toLowerCase().trim();
   const minScore = parseFloat(filterScore.value);
 
   filtered = DATA.filter(d => {
     if (type === 'portfolio' && !d.isPortfolio) return false;
     if (type === 'non-portfolio' && d.isPortfolio) return false;
-    if (fund !== 'all' && d.fund !== parseInt(fund)) return false;
-    if (rel !== 'all' && d.relType !== rel) return false;
+    if (funds && !funds.includes(String(d.fund))) return false;
+    if (rels && (!d.relType || !rels.includes(d.relType))) return false;
     if (search && !d.name.toLowerCase().includes(search)) return false;
     if (d.overall < minScore) return false;
     return true;
@@ -4513,9 +4512,34 @@ function renderCompare() {
 }
 
 // === FILTER LISTENERS ===
-document.getElementById('filterRel').addEventListener('change', applyFilters);
+// Pill multi-select logic
+document.querySelectorAll('.pill-group').forEach(group => {
+  group.addEventListener('click', e => {
+    const pill = e.target.closest('.pill');
+    if (!pill) return;
+    const isAll = pill.dataset.val === 'all';
+    if (isAll) {
+      // Click "All" -> deselect everything else, select All
+      group.querySelectorAll('.pill').forEach(p => p.classList.remove('active'));
+      pill.classList.add('active');
+    } else {
+      // Toggle this pill
+      pill.classList.toggle('active');
+      // Deselect "All" if any specific is selected
+      const allPill = group.querySelector('.pill[data-val="all"]');
+      const anySpecific = group.querySelectorAll('.pill.active:not([data-val="all"])').length > 0;
+      if (anySpecific) {
+        allPill.classList.remove('active');
+      } else {
+        // Nothing selected -> reactivate All
+        allPill.classList.add('active');
+      }
+    }
+    applyFilters();
+  });
+});
+
 filterType.addEventListener('change', applyFilters);
-filterFund.addEventListener('change', applyFilters);
 searchInput.addEventListener('input', applyFilters);
 filterScore.addEventListener('change', applyFilters);
 
